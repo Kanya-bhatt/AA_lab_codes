@@ -1,40 +1,55 @@
-#include <iostream>
-#include <vector>
-
+#include<bits/stdc++.h>
 using namespace std;
 
-bool isSubsetSum(int set[], int n, int sum) {
-    vector<vector<bool> > dp(n + 1, vector<bool>(sum + 1, false));
-
-    
-    for (int i = 0; i <= n; i++) {
-        dp[i][0] = true;
-    }
-
-    
-    for (int i = 1; i <= n; i++) {
-        for (int j = 1; j <= sum; j++) {
-            if (set[i - 1] <= j) {
-                dp[i][j] = dp[i - 1][j] || dp[i - 1][j - set[i - 1]];
-            } else {
-                dp[i][j] = dp[i - 1][j];
-            }
-        }
-    }
-
-    return dp[n][sum];
+bool Knapsack(vector<vector<int>> & mat, vector<int>&arr, int n, int sum){
+    for(int i = 0; i < n+1; i++){
+		mat[i][0] = 0;
+	} 
+	for(int j = 1; j <= sum; j++){
+		mat[0][j] = 0;
+	}
+    for(int i = 1; i < n+1; i++){
+		for(int j = 1; j <= sum; j++){
+			if(j < arr[i])
+				mat[i][j] = mat[i-1][j];
+			else
+				mat[i][j] = max(mat[i-1][j], mat[i-1][j - arr[i]] + arr[i]);
+		}
+	} 
+    if(mat[n][sum] >= sum)return true;
+    else return false;
 }
 
-int main() {
-    int set[] = {3, 5, 7, 9, 11};
-    int sum = 13;
-    int n = sizeof(set) / sizeof(set[0]);
+int main(){
+    int n;
+    cout << "Enter size : " << endl;
+    cin >> n;
 
-    if (isSubsetSum(set, n, sum)) {
-        cout << "Subset with the given sum exists." << endl;
-    } else {
-        cout << "No subset with the given sum exists." << endl;
+    int sum;
+    cout << "Enter sum : " << endl;
+    cin >> sum;
+    vector<vector<int>>mat(n+1, vector<int>(sum + 1));
+
+    set<int>s;
+    vector<int>arr(n + 1);
+    cout << "Enter set : " << endl;
+    
+    s.insert(0);
+    int temp;
+    for(int i = 1; i < n+1; i++){
+        cin >> temp;
+        s.insert(temp);
     }
 
+    int i = 1;
+    arr[0] = 0;
+    for(auto ele : s){
+        arr[i] = ele;
+        i++;
+    }
+    if(Knapsack(mat, arr, n, sum) == true)
+        printf("Hurehhh!!!");
+    else
+        printf("Oops!!!");
     return 0;
 }
