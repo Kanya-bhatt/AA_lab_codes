@@ -1,59 +1,36 @@
-#include<stdio.h>
-#include<string.h>
-#define NO_OF_CHARS 256
+#include<iostream>
+#include<bits/stdc++.h>
+using namespace std;
 
-int getNextState(char *pat, int M, int state, int x)
-{
-	if (state < M && x == pat[state])
-		return state+1;
-
-	int ns, i;
-	for (ns = state; ns > 0; ns--)
-	{
-		if (pat[ns-1] == x)
-		{
-			for (i = 0; i < ns-1; i++)
-				if (pat[i] != pat[state-ns+1+i])
-					break;
-			if (i == ns-1)
-				return ns;
-		}
-	}
-
-	return 0;
-}
-void computeTF(char *pat, int M, int TF[][NO_OF_CHARS])
-{
-	int state, x;
-	for (state = 0; state <= M; ++state)
-		for (x = 0; x < NO_OF_CHARS; ++x)
-			TF[state][x] = getNextState(pat, M, state, x);
+void FA(string t, string p){
+    
+    int state_table[4][2] = {
+        {1, 0},
+        {1, 2},
+        {1, 3},
+        {1, 0}
+    };
+    int n = t.length();
+    int m = p.length();
+    
+    
+    int q = 0;
+    for(int i = 0; i <= n; i++){
+        // cout << "q: " << q << " t[i]-'a': " << t[i]-'a'<< endl;
+        q = state_table[q][t[i]-'a'];
+        cout << "q: " << q << endl;
+        if(q == m){
+            cout << "shift: '" << i - m + 1 << "' matched " << endl;
+            q = 0;
+        }
+    }
 }
 
-
-void search(char *pat, char *txt)
-{
-	int M = strlen(pat);
-	int N = strlen(txt);
-
-	int TF[M+1][NO_OF_CHARS];
-
-	computeTF(pat, M, TF);
-	int i, state=0;
-	for (i = 0; i < N; i++)
-	{
-		state = TF[state][txt[i]];
-		if (state == M)
-			printf ("\n Pattern found at index %d",
-										i-M+1);
-	}
-}
-
-int main()
-{
-	// char arr = ['A', 'A', 'B', 'A', 'A','C', 'A', 'A', 'D', 'A', 'A', 'B', 'A', 'A', 'A', 'B', 'A',A"]
-	char *txt = "AABAACAADAABAAABAA";
-	char *pat = "AABA";
-	search(pat, txt);
-	return 0;
+int main(){
+    
+    string text = "abbabbjabb";
+    string pattern = "abb";
+    
+    
+    FA(text, pattern);
 }
