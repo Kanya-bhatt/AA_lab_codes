@@ -4,9 +4,9 @@
 #include <ctime>
 using namespace std;
 
-// Function to contract the graph G by merging nodes u and v
+
 vector<vector<int>> contractGraph(vector<vector<int>>& G, int u, int v, int n) {
-    // Create a new graph with size (n-1) x (n-1)
+   
     vector<vector<int>> G2(n - 1, vector<int>(n - 1, 0));
 
     int idx = 0;
