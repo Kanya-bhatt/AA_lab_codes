@@ -45,8 +45,8 @@ void search(char pat[], char txt[], int q)
 /* Driver code */
 int main()
 {
-    char txt[] = "Jim_saw_me_in_a_barber_shop";
-    char pat[] = "barber";
+    char txt[] = "1234567";
+    char pat[] = "67";
     int q = INT_MAX;
  
     // Function Call
