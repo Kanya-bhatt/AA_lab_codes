@@ -1,67 +1,87 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include<bits/stdc++.h>
 
-void computeLPSArray(char* pat, int M, int* lps);
-void KMPSearch(char* pat, char* txt)
-{
-	int M = strlen(pat);
-	int N = strlen(txt);
-	int lps[M];
-	computeLPSArray(pat, M, lps);
+using namespace std;
+int comp = 0;
 
-	int i = 0; 
-	int j = 0; 
-	while ((N - i) >= (M - j)) {
-		if (pat[j] == txt[i]) {
-			j++;
-			i++;
-		}
-
-		if (j == M) {
-			printf("Found pattern at index %d ", i - j);
-			j = lps[j - 1];
-		}
-
-		else if (i < N && pat[j] != txt[i]) {
-			if (j != 0)
-				j = lps[j - 1];
-			else
-				i = i + 1;
-		}
-	}
+void computePrefixFunction(vector<int> &pi, int m, string pattern){
+    pi[1] = 0;
+    int k = 0;
+    
+    for(int q = 2; q <= m; q++){
+  	 
+   	 bool t = pattern[k + 1] != pattern[q];
+  	 
+   	 comp++;
+   	 while(k > 0  && t){
+   		 k = pi[k];
+   		 t = pattern[k + 1] != pattern[q];
+   		 comp++;
+  	 
+   	 }
+  	 
+   	 if(!t){
+   		 k++;
+   	 }
+	 
+   	 pi[q] = k;
+    }
+    
+    cout << comp << endl;
+    for(int i = 1; i <= m; i++){
+    	cout << pi[i] << " ";
+    }
+    cout << endl;
+    
+    
 }
 
 
-void computeLPSArray(char* pat, int M, int* lps)
-{
-	int len = 0;
-
-	lps[0] = 0; // lps[0] is always 0
-	int i = 1;
-	while (i < M) {
-		if (pat[i] == pat[len]) {
-			len++;
-			lps[i] = len;
-			i++;
-		}
-		else // (pat[i] != pat[len])
-		{
-				if (len != 0) {
-				len = lps[len - 1];
-			}
-			else // if (len == 0)
-			{
-				lps[i] = 0;
-				i++;
-			}
-		}
+void KmpMatcher(vector<int> pi, string text, string pattern){
+	int q = 0, count = 0;
+	int m = pattern.length() - 1;
+	int n = text.length() - 1;
+	for(int i = 1; i <= n; i++){
+    	bool t = pattern[q + 1] != text[i];
+    	count++;
+    	while(q > 0 && t){
+        	q = pi[q];
+        	t = pattern[q + 1] != text[i];
+        	count++;
+       	 
+       	 
+    	}
+    	if(!t){
+        	q = q + 1;
+    	}
+ 
+   	 
+    	if(q == m){
+       	 
+        	cout << "pattern occured with shift: " << i - m << endl;
+        	q = pi[q];
+       	 
+    	}
 	}
+	cout << count << " ";
 }
 
-// Driver code
 int main()
 {
-	char txt[] = "ABABDABACDABABCABAB";
-	char pat[] = "ABABCABAB";
-	KMPSearch(pat, txt);
+   
+    
+	string pattern, text;
+	cin >> pattern >> text;
+	int m = pattern.length() - 1;
+	int n = text.length() - 1;
+	vector<int> pi(m + 1);
+    
+	computePrefixFunction(pi, m, pattern);
+    
+    
+	KmpMatcher(pi, text, pattern);
+    
 	return 0;
 }
+
+
