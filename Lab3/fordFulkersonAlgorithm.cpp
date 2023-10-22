@@ -1,72 +1,89 @@
-#include <iostream>
-#include <vector>
-#include <cstdlib>
-#include <ctime>
+#include<bits/stdc++.h>
 using namespace std;
 
-// Function to contract the graph G by merging nodes u and v
-vector<vector<int>> contractGraph(vector<vector<int>>& G, int u, int v, int n) {
-    // Create a new graph with size (n-1) x (n-1)
-    vector<vector<int>> G2(n - 1, vector<int>(n - 1, 0));
-
-    int idx = 0;
-    for (int i = 0; i < n; i++) {
-        if (i != u && i != v) {
-            int jdx = 0;
-            for (int j = 0; j < n; j++) {
-                if (j != u && j != v) {
-                    G2[idx][jdx] = G[i][j];
-                    jdx++;
-                }
-            }
-            idx++;
-        }
-    }
-
-    for (int i = 0; i < n - 1; i++) {
-        for (int j = 0; j < n - 1; j++) {
-            if (i >= j) {
-                G2[i][j] = G2[j][i];
-            }
-        }
-    }
-
-    return G2;
+//if augmenting path exists returns true
+bool bfs(vector<vector<int>>&residual_graph, int s, int t, vector<int>&parent, int N){
+	vector<int>visited(N, 0);
+    
+	queue<int>q;
+	q.push(s);
+	visited[s] = 1;
+	parent[s] = -1;
+    
+	while(!q.empty()){
+    	int u = q.front();
+    	q.pop();
+    	for(int v = 0; v < N; v++){
+        	if(visited[v] == 0 && residual_graph[u][v] > 0){
+            	if(v == t){
+                	parent[v] = u;
+                	return true;
+            	}
+           	 
+            	q.push(v);
+            	visited[v] = 1;
+            	parent[v] = u;
+        	}
+    	}
+	}
+	return false;
 }
 
-int minCut(vector<vector<int>>& G, int n, vector<vector<int>>& edge) {
-    if (n == 2) {
-        return G[0][1]; // Base case: return the remaining edge weight
-    }
-
-    int val = (rand() % edge.size());
-    int u = edge[val][0];
-    int v = edge[val][1];
-
-    // Recursively contract the graph G
-    vector<vector<int>> contractedGraph = contractGraph(G, u, v, n);
-
-    return minCut(contractedGraph, n - 1, edge);
+int ford_fulkerson(vector<vector<int>>&graph, int source, int sink, int N){
+	vector<vector<int>>residual_graph(N, vector<int>(N));
+    
+	for(int u = 0; u < N; u++){
+    	for(int v = 0; v < N; v++){
+        	residual_graph[u][v] = graph[u][v];
+    	}
+	}
+    
+	vector<int>parent(N);
+	int max_flow = 0;
+	int path_flow = INT_MAX;
+    
+	while(bfs(residual_graph, source, sink, parent, N)){
+    	int u;
+    	for(int v = sink; v != source; v = parent[v]){
+        	u = parent[v];
+        	path_flow = min(path_flow, residual_graph[u][v]);
+    	}
+   	 
+    	//update the residual graph
+    	for(int v = sink; v != source; v = parent[v]){      	//whole path
+        	u = parent[v];
+        	residual_graph[u][v] -= path_flow;
+        	residual_graph[v][u] += path_flow;
+    	}
+    	max_flow += path_flow;
+	}
+	return max_flow;
 }
 
-int main() {
-    srand(time(0));
+int main()
+{
+	int N;
+	cout << "Enter number of vertices : " ;
+	cin >> N;
+	vector<vector<int>>graph(N, vector<int>(N, 0));
+  
+    
+	int total_edges;
+	cout << "How many total edges you want to add? " ;
+	cout << endl;
+	cin >> total_edges;
+    
+	for(int i = 0; i < total_edges; i++){
+    	cout << "Enter edges from source to destination : " ;
+    	int u, v;
+    	cin >> u >> v;
+    	int max_capacity;
+    	cout << "Enter max capacity : ";
+    	cin >> max_capacity;
+   	 
+    	graph[u][v]= max_capacity;
+	}
+	cout << "max flow is : " << ford_fulkerson(graph, 0, N-1, N);
 
-    int n;
-    cout << "enter the number of vertices: " << endl;
-    cin >> n;
-    vector<vector<int>> G(n, vector<int>(n, 0));
-
-    int temp;
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            cin >> temp;
-            G[i][j] = temp;
-        }
-    }
-
-    vector<vector<int>> edge = { {1, 2}, {1, 3}, {1, 4}, {2, 3}, {3, 4} };
-    cout << minCut(G, n, edge) << endl;
-
-    return 0;
+	return 0;
 }
